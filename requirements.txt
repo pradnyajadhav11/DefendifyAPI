@@ -1,0 +1,13 @@
+PyPDF2
+pandas  
+olefile
+zipfile
+numpy
+scikit-learn
+joblib
+opencv-python 
+scikit-image
+python-pptx
+python-docx
+flask
+flask-cors
