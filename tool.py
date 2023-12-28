@@ -1,16 +1,14 @@
 import PyPDF2
-import olefile
-import sys
 import zipfile
 import csv
 from docx import Document
 from pptx import Presentation
-import numpy as np
 from skimage.feature import hog
 from sklearn.svm import SVC
 import joblib
 import cv2
 import os
+import sys
 
 # Function to extract HOG features from an image
 def get_hog_features(image):
@@ -24,9 +22,9 @@ def classify_image(image_path, clf):
     hog_features = get_hog_features(img)
     prediction = clf.predict([hog_features])
     return prediction[0]
-clf = joblib.load('/home/pradnya/flaskapi/trained_classifier_model.pkl')
 
-# ... (Your other functions)
+# Load the classifier
+clf = joblib.load('trained_classifier_model.pkl')
 
 def check_image_maliciousness(image_path, clf):
     try:
@@ -37,7 +35,6 @@ def check_image_maliciousness(image_path, clf):
             return False, "The image is not classified as malicious."
     except Exception as e:
         return False, f"Error analyzing the image: {str(e)}"
-    
 
 def check_zip_maliciousness(file_path):
     try:
@@ -59,7 +56,6 @@ def check_zip_maliciousness(file_path):
     except Exception as e:
         return False, f"Error analyzing the ZIP file: {str(e)}"
 
-
 def check_pdf_maliciousness(file_path):
     try:
         with open(file_path, 'rb') as pdf_file:
@@ -78,7 +74,7 @@ def check_pdf_maliciousness(file_path):
 
     except Exception as e:
         return False, f"Error analyzing the PDF: {str(e)}"
-    
+
 def check_pptx_maliciousness(file_path):
     try:
         prs = Presentation(file_path)
@@ -94,7 +90,6 @@ def check_pptx_maliciousness(file_path):
 
     except Exception as e:
         return False, f"Error analyzing the PPTX file: {str(e)}"
-    
 
 def check_docx_maliciousness(file_path):
     try:
@@ -109,7 +104,6 @@ def check_docx_maliciousness(file_path):
 
     except Exception as e:
         return False, f"Error analyzing the DOCX file: {str(e)}"
-    
 
 def check_csv_maliciousness(file_path):
     try:
@@ -124,33 +118,43 @@ def check_csv_maliciousness(file_path):
     except Exception as e:
         return False, f"Error analyzing the CSV file: {str(e)}"
 
-def check_file_maliciousness(file_path):
-    if file_path.lower().endswith('.pdf'):
-        return check_pdf_maliciousness(file_path)
-    elif file_path.lower().endswith('.png'):
-        return check_image_maliciousness(file_path, clf)
-    elif file_path.lower().endswith('.pptx'):
-        return check_pptx_maliciousness(file_path)
-    elif file_path.lower().endswith('.docx'):
-        return check_docx_maliciousness(file_path)
-    elif file_path.lower().endswith(('.csv', '.xlsx')):
-        return check_csv_maliciousness(file_path)
-    elif file_path.lower().endswith('.zip'):
-        return check_zip_maliciousness(file_path)
-    else:
-        return False, "Unsupported file type for analysis."
+def convert_uri_to_local_path(file_uri):
+    # Implement logic to convert URI to local file path
+    # This might involve using a library like react-native-fs
+    pass
 
+def check_file_maliciousness(file_uri):
+    try:
+        # Convert URI to local file path
+        file_path = convert_uri_to_local_path(file_uri)
 
+        if file_path.lower().endswith('.pdf'):
+            return check_pdf_maliciousness(file_path)
+        elif file_path.lower().endswith('.png'):
+            return check_image_maliciousness(file_path, clf)
+        elif file_path.lower().endswith('.pptx'):
+            return check_pptx_maliciousness(file_path)
+        elif file_path.lower().endswith('.docx'):
+            return check_docx_maliciousness(file_path)
+        elif file_path.lower().endswith(('.csv', '.xlsx')):
+            return check_csv_maliciousness(file_path)
+        elif file_path.lower().endswith('.zip'):
+            return check_zip_maliciousness(file_path)
+        else:
+            return False, "Unsupported file type for analysis."
+
+    except Exception as e:
+        return False, f"Error analyzing the file: {str(e)}"
 
 if __name__ == "__main__":
-    # Check if a file path is provided as a command-line argument
+    # Check if a file URI is provided as a command-line argument
     if len(sys.argv) < 2:
-        print("Usage: python tool_combined.py <file_path>")
+        print("Usage: python tool_combined.py <file_uri>")
         sys.exit(1)
 
-    file_path = sys.argv[1]
+    file_uri = sys.argv[1]
 
-    is_malicious, message = check_file_maliciousness(file_path)
+    is_malicious, message = check_file_maliciousness(file_uri)
 
     print(f"Malicious: {is_malicious}")
     print(f"Analysis Result: {message}")
