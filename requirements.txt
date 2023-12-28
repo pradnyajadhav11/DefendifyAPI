@@ -1,7 +1,6 @@
 PyPDF2
 pandas  
 olefile
-zipfile
 jsonify
 numpy
 scikit-learn
