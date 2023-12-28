@@ -3,7 +3,7 @@ from flask_cors import CORS
 import subprocess
 
 app = Flask(__name__)
-CORS(app, resources={r"/malwaredetection": {"origins": "http://192.168.0.105:5000"}})
+CORS(app, resources={r"/malwaredetection": {"origins": "http://0.0.0.0:5000"}})
 
 @app.route('/malwaredetection', methods=['POST'])
 def malwaredetection():
