@@ -9,14 +9,15 @@ CORS(app, resources={r"/malwaredetection": {"origins": "http://0.0.0.0:5000"}})
 def malwaredetection():
     try:
         if request.method == 'POST':
-            # Check if the content type is 'text/plain'
-            if request.content_type == 'text/plain':
-                file_path = request.data.decode('utf-8')
-            else:
-                file_path = request.json.get('file_path')
+            # Check if a file is provided in the request
+            if 'file' not in request.files:
+                return jsonify({"error": "No file provided"}), 400
 
-            if not file_path:
-                return jsonify({"error": "File path not provided"}), 400
+            file = request.files['file']
+
+            # Save the file to a temporary location (you might want to handle this differently)
+            file_path = '/tmp/' + file.filename
+            file.save(file_path)
 
             result = subprocess.check_output(['python', 'tool.py', file_path], text=True)
 
@@ -29,4 +30,4 @@ def malwaredetection():
         return jsonify({"error": str(e)})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
